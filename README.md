@@ -10,5 +10,7 @@ It then estimates votes for the 2022 House of Representative elections using Tru
 
 To run this yourself, this assumes using python 3 and a handful of python libraries and SQL Server 2019. Other versions or flavors of SQL with geospatial abilities should need minimal modifications.
 
+Requires at least 20 GB of space for the census data.
+
 Make_Main_Env.bat creates the conda environment needed to run this project's code
 Load_CensusDB.py downloads needed census data and stores it in the SQL db.

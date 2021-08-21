@@ -38,17 +38,17 @@ Create Table Congressional_District (
 	Border Geography Not Null,
 	Constraint Population_Subset_CD Check (Population_2020>=Adult_Population_2020),
 	Constraint Congressional_District_PK Primary Key(State_FIPS,Congressional_District))
+
 Create Table Voting_District (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_VD Check (Len(Trim(Precinct))=6),
 	[Name] VarChar(100) Not Null,
 	Population_2020 Int Not Null, 
 	Adult_Population_2020 Int Not Null, 
 	Area BigInt Not Null,
 	Border Geography Not Null,
-	Constraint 
-	PK Primary Key(State_FIPS,County_FIPS,Precinct),
+	Constraint Voting_District_PK Primary Key(State_FIPS,County_FIPS,Precinct),
 	Constraint Voting_District_County_FK Foreign Key(State_FIPS,County_FIPS) References County)
 Create Table Census_Tract (
 	State_FIPS TinyInt Not Null,
@@ -140,14 +140,14 @@ Exec sp_tableoption 'dbo.County_Population_Area', 'table lock on bulk load', 1
 Create Table Voting_District (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_VD Check (Len(Trim(Precinct))=6),
 	[Name] VarChar(100) Not Null,
 	Constraint Voting_District_PK Primary Key(State_FIPS,County_FIPS,Precinct))
 Exec sp_tableoption 'dbo.Voting_District', 'table lock on bulk load', 1
 Create Table Voting_District_Geo (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null  Constraint Precinct_Domain_VDG Check (Len(Trim(Precinct))=6),
 	Area BigInt Not Null,
 	Border Text Not Null,
 	Constraint Voting_District_Geo_PK Primary Key(State_FIPS,County_FIPS,Precinct)
@@ -156,20 +156,11 @@ Exec sp_tableoption 'dbo.Voting_District_Geo', 'table lock on bulk load', 1
 Create Table Voting_District_Population (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_VDP Check (Len(Trim(Precinct))=6),
 	Population_2020 Int Not Null,
 	Adult_Population_2020 Int Not Null,
 	Constraint Voting_District_Population_PK Primary Key(State_FIPS,County_FIPS,Precinct)
 )
-Exec sp_tableoption 'dbo.Voting_District_Population', 'table lock on bulk load', 1
-Create Table Census_Tract_Population_Area (
-	State_FIPS TinyInt Not Null,
-	County_FIPS SmallInt Not Null,
-	Census_Tract Int Not Null,
-	Population_2020 Int Not Null,
-	Adult_Population_2020 Int Not Null,
-	Area BigInt Not Null,
-	Constraint Census_Tract_Population_Area_PK Primary Key(State_FIPS,County_FIPS,Census_Tract))
 Exec sp_tableoption 'dbo.Census_Tract_Population_Area', 'table lock on bulk load', 1
 Create Table Census_Tract_Geo (
 	State_FIPS TinyInt Not Null,
@@ -219,7 +210,7 @@ Create Table Census_Block_Voting_District (
 	County_FIPS SmallInt Not Null,
 	Census_Tract Int Not Null,
 	Census_Block SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_CBVD Check (Len(Trim(Precinct))=6),
 	Constraint Census_Block_Voting_District_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block)
 	)
 Exec sp_tableoption 'dbo.Census_Block_Voting_District', 'table lock on bulk load', 1
@@ -242,7 +233,7 @@ Exec sp_tableoption 'dbo.Congressional_District_Geo', 'table lock on bulk load',
 Create Table Vote_Texas_VEST (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_VTV Check (Len(Trim(Precinct))=6),
 	Dem_Votes SmallInt Not Null,
 	GOP_Votes SmallInt Not Null,
 	Constraint Texas_VEST_PK Primary Key(State_FIPS,County_FIPS,Precinct))
@@ -250,7 +241,7 @@ Exec sp_tableoption 'dbo.Vote_Texas_VEST', 'table lock on bulk load', 1
 Create Table Vote_Texas_Raw (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_VTR Check (Len(Trim(Precinct))=6),
 	Dem_Votes SmallInt Not Null,
 	GOP_Votes SmallInt Not Null,
 	Constraint Texas_Raw_PK Primary Key(State_FIPS,County_FIPS,Precinct))
@@ -264,7 +255,7 @@ Exec sp_tableoption 'dbo.Vote_Texas_County', 'table lock on bulk load', 1
 Create Table Vote_Georgia_VEST (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
-	Precinct VarChar(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null,
+	Precinct Char(6) Collate SQL_Latin1_General_CP1_CS_AS Not Null Constraint Precinct_Domain_VGV Check (Len(Trim(Precinct))=6),
 	Dem_Votes SmallInt Not Null,
 	GOP_Votes SmallInt Not Null,
 	County_Name VarChar(35) Not Null,
