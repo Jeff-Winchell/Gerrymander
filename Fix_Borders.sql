@@ -1,0 +1,45 @@
+Use GerryMatter
+Go
+Update [State]
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update [State]
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+Update County
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update County
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+Update Congressional_District
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update Congressional_District
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+Update Voting_District
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update Voting_District
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+Update Census_Tract
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update Census_Tract
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+Update Census_Block_Group
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update Census_Block_Group
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+Update Census_Block
+	Set Border=Border.MakeValid()
+	Where Border.STIsValid()=0
+Update Census_Block
+	Set Border=Border.ReorientObject().MakeValid()
+	Where Border.STArea()>500000000000000
+
