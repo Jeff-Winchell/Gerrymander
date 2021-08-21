@@ -8,7 +8,10 @@ Voting behavior plays NO role in this map generation.
 
 It then estimates votes for the 2022 House of Representative elections using Trump v Biden 2020 election results at the precinct level as a proxy for Dem vs non-Dem voting.
 
-To run this yourself, this assumes using python 3 and a handful of python libraries and SQL Server 2019. Other versions or flavors of SQL with geospatial abilities should need minimal modifications.
+To run this yourself, this assumes installing python 3 and a handful of python libraries via conda (e.g https://docs.conda.io/en/latest/miniconda.html)
+and does large scale data storage and manipulation in SQL Server 2019 (free developer version https://www.microsoft.com/en-us/sql-server/sql-server-downloads). 
+
+Other versions or flavors of SQL with geospatial abilities (e.g. PostgreSQL, Oracle, MySQL, etc) should only need minimal to modest modifications.
 
 Requires at least 20 GB of space for the census data.
 
