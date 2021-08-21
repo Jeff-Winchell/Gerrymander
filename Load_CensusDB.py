@@ -267,3 +267,4 @@ os.system('sqlcmd -E -Q "Insert Into GerryMatter..Voting_District with (TabLock)
 os.system('sqlcmd -E -Q "Set Quoted_Identifier On; Create Spatial Index Border On GerryMatter..Voting_District(Border)"')
 
 os.system('sqlcmd -E -i Fix_Borders.sql')
+os.system('sqlcmd -E -i Calculated_Columns.sql')
