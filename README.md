@@ -13,7 +13,7 @@ and does large scale data storage and manipulation in SQL Server 2019 (free deve
 
 Other versions or flavors of SQL with geospatial abilities (e.g. PostgreSQL, Oracle, MySQL, etc) should only need minimal to modest modifications.
 
-Requires at least 20 GB of space for the census data.
+Requires at least 5 GB of space for the census data (60 GB if you use census tracts, block groups and blocks).
 
 Make_Main_Env.bat creates the conda environment needed to run this project's code
 Load_CensusDB.py downloads needed census data and stores it in the SQL db.
