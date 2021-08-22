@@ -13,7 +13,7 @@ and does large scale data storage and manipulation in SQL Server 2019 (free deve
 
 Other versions or flavors of SQL with geospatial abilities (e.g. PostgreSQL, Oracle, MySQL, etc) should only need minimal to modest modifications.
 
-Downloading the census data takes an hour and requires at 20 GB of space for the census data (60 GB and up to a day if you use census tracts, block groups and blocks).
+Downloading the census data takes an hour and requires at 20 GB of space for the census data. It requires 60 GB and up to a day of processing if you use census tracts, block groups and blocks - which is enabled by changing the first line of Load_CensusDB.py.  If you want much less data (e.g. just for one state) edit the dictionary of states near the start of Load_CensusDB.py.
 
 Make_Main_Env.bat creates the conda environment needed to run this project's code
-Load_CensusDB.py downloads needed census data and stores it in the SQL db.
+Load_CensusDB.py downloads needed census data and stores it in the SQL db for use in the map generation.
