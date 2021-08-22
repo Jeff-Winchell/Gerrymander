@@ -7,6 +7,7 @@ Create Database GerryMatter
 Go
 Use GerryMatter
 Go
+Set Quoted_Identifier On
 Create Table [State] (
 	FIPS TinyInt Not Null Constraint State_PK Primary Key,
 	Postal Char(2) Not Null Constraint State_CK Unique,
@@ -16,6 +17,7 @@ Create Table [State] (
 	Adult_Population_2020 Int Not Null, --Redundant
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Population_Subset_ST Check (Population_2020>=Adult_Population_2020),
 	)
 Create Table County (
@@ -26,6 +28,7 @@ Create Table County (
 	Adult_Population_2020 Int Not Null, --Redundant
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Population_Subset_CTY Check (Population_2020>=Adult_Population_2020),
 	Constraint County_PK Primary Key(State_FIPS,County_FIPS),
 	Constraint County_AK Unique (State_FIPS,[Name])
@@ -37,6 +40,7 @@ Create Table Congressional_District (
 	Adult_Population_2020 Int Not Null, --Redundant
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Population_Subset_CD Check (Population_2020>=Adult_Population_2020),
 	Constraint Congressional_District_PK Primary Key(State_FIPS,Congressional_District)
 	)
@@ -49,6 +53,7 @@ Create Table Voting_District (
 	Adult_Population_2020 Int Not Null, 
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Voting_District_PK Primary Key(State_FIPS,County_FIPS,Precinct),
 	Constraint Voting_District_County_FK Foreign Key(State_FIPS,County_FIPS) References County
 	)
@@ -147,3 +152,12 @@ Create Table Census_Block_Voting_District (
 	Constraint Census_Block_Voting_District_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block)
 	)
 Exec sp_tableoption 'dbo.Census_Block_Voting_District', 'table lock on bulk load', 1
+Create Table Census_Block_Congressional_District (
+	State_FIPS TinyInt Not Null,
+	County_FIPS SmallInt Not Null,
+	Census_Tract Int Not Null,
+	Census_Block SmallInt Not Null,
+	Congressional_District TinyInt Not Null,
+	Constraint Census_Block_Congressional_District_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block)
+	)
+Exec sp_tableoption 'dbo.Census_Block_Congressional_District', 'table lock on bulk load', 1

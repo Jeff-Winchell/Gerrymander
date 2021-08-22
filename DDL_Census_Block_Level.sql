@@ -1,5 +1,6 @@
 Use GerryMatter
 Go
+Set Quoted_Identifier On
 Create Table Census_Tract (
 	State_FIPS TinyInt Not Null,
 	County_FIPS SmallInt Not Null,
@@ -8,6 +9,7 @@ Create Table Census_Tract (
 	Adult_Population_2020 Int Not Null,
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Population_Subset_CT Check (Population_2020>=Adult_Population_2020),
 	Constraint Census_Tract_County_FK Foreign Key(State_FIPS,County_FIPS) References County,
 	Constraint Census_Tract_PK Primary Key(State_FIPS,County_FIPS,Census_Tract))
@@ -20,6 +22,7 @@ Create Table Census_Block_Group (
 	Adult_Population_2020 Int Not Null,
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Population_Subset_CBG Check (Population_2020>=Adult_Population_2020),
 	Constraint Census_Block_Group_Census_Tract_FK Foreign Key(State_FIPS,County_FIPS,Census_Tract) References Census_Tract,
 	Constraint Census_Block_Group_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block_Group))
@@ -32,6 +35,7 @@ Create Table Census_Block (
 	Adult_Population_2020 SmallInt Not Null,
 	Area BigInt Not Null,
 	Border Geography Not Null,
+	Calc_Area As Border.STArea() Persisted,
 	Constraint Population_Subset_CB Check (Population_2020>=Adult_Population_2020),
 	Constraint Census_Block_Tract_FK Foreign Key(State_FIPS,County_FIPS,Census_Tract) References Census_Tract,
 	Constraint Census_Block_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block))
@@ -73,12 +77,3 @@ Create Table Census_Block_Geo (
 	Border Text Not Null,
 	Constraint Census_Block_Geo_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block))
 Exec sp_tableoption 'dbo.Census_Block_Geo', 'table lock on bulk load', 1
-Create Table Census_Block_Congressional_District (
-	State_FIPS TinyInt Not Null,
-	County_FIPS SmallInt Not Null,
-	Census_Tract Int Not Null,
-	Census_Block SmallInt Not Null,
-	Congressional_District TinyInt Not Null,
-	Constraint Census_Block_Congressional_District_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block)
-	)
-Exec sp_tableoption 'dbo.Census_Block_Congressional_District', 'table lock on bulk load', 1

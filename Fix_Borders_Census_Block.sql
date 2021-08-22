@@ -1,21 +1,12 @@
 Use GerryMatter
 Go
-Update Census_Tract
-	Set Border=Border.MakeValid()
-	Where Border.STIsValid()=0
+Set Quoted_Identifier On
 Update Census_Tract
 	Set Border=Border.ReorientObject().MakeValid()
 	Where Calc_Area>500000000000000
 Update Census_Block_Group
-	Set Border=Border.MakeValid()
-	Where Border.STIsValid()=0
-Update Census_Block_Group
 	Set Border=Border.ReorientObject().MakeValid()
 	Where Calc_Area>500000000000000
-Update Census_Block
-	Set Border=Border.MakeValid()
-	Where Border.STIsValid()=0
-
 
 Declare [State] Cursor For Select FIPS From [State]
 Declare @State_FIPS TinyInt
