@@ -294,7 +294,12 @@ if Minimum_Granularity=='Census Block':
     os.system('sqlcmd -E -Q "Set Quoted_Identifier On; Create Spatial Index Border On GerryMatter..Census_Block(Border)"')
     os.system('sqlcmd -E -Q "Set Quoted_Identifier On; Create Index Calc_Area On GerryMatter..Census_Block(Calc_Area)"')
 
+os.system('sqlcmd -E -i Precinct_Congressional_District.sql')
 os.system('sqlcmd -E -i Fix_Borders_Precinct.sql')
+os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
+os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
+os.system('sqlcmd -E -i Edge_Precinct.sql')
+os.system('sqlcmd -E -i Congressional_District_Border_Precinct.sql')
 if Minimum_Granularity=='Census Block':
     os.system('sqlcmd -E -i Fix_Borders_Census_Block.sql')
 print(datetime.datetime.now(),'Done')
