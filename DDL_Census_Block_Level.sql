@@ -69,11 +69,3 @@ Create Table Census_Block_Group_Geo (
 	Border Text Not Null,
 	Constraint Census_Block_Group_Geo_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block_Group))
 Exec sp_tableoption 'dbo.Census_Block_Group_Geo', 'table lock on bulk load', 1
-Create Table Census_Block_Geo (
-	State_FIPS TinyInt Not Null,
-	County_FIPS SmallInt Not Null,
-	Census_Tract Int Not Null,
-	Census_Block SmallInt Not Null,
-	Border Text Not Null,
-	Constraint Census_Block_Geo_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block))
-Exec sp_tableoption 'dbo.Census_Block_Geo', 'table lock on bulk load', 1

@@ -1,8 +1,9 @@
-Select Distinct GerryMatter_Raw..Census_Block_Congressional_District.State_FIPS,
+Drop Table If Exists GerryMatter..Voting_District_Congressional_District
+Select Distinct Census_Block_Voting_District.State_FIPS,
 		Census_Block_Voting_District.County_FIPS,
 		Census_Block_Voting_District.Precinct,
 		Census_Block_Congressional_District.Congressional_District
-	Into Voting_District_Congressional_District
+	Into GerryMatter..Voting_District_Congressional_District
 	From GerryMatter_Raw..Census_Block_Congressional_District
 			Inner Join
 	GerryMatter_Raw..Census_Block_Voting_District
@@ -10,4 +11,4 @@ Select Distinct GerryMatter_Raw..Census_Block_Congressional_District.State_FIPS,
 					And Census_Block_Congressional_District.County_FIPS=Census_Block_Voting_District.County_FIPS
 					And Census_Block_Congressional_District.Census_Tract=Census_Block_Voting_District.Census_Tract
 					And Census_Block_Congressional_District.Census_Block=Census_Block_Voting_District.Census_Block
-Alter Table Voting_District_Congressional_District Add Constraint Voting_District_Congressional_District_PK Primary Key (State_FIPS,County_FIPS,Precinct,Congressional_District)
+Alter Table GerryMatter..Voting_District_Congressional_District Add Constraint Voting_District_Congressional_District_PK Primary Key (State_FIPS,County_FIPS,Precinct,Congressional_District)
