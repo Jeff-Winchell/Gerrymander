@@ -1,6 +1,7 @@
 Set Quoted_Identifier On
+Drop Table If Exists GerryMatter..State_Neighbor
 Select A1.FIPS As A1_State_FIPS,A2.FIPS As A2_State_FIPS
-	Into State_Neighbor
+	Into GerryMatter..State_Neighbor
 	From GerryMatter..[State] A1 Cross Join GerryMatter..[State] A2
 	Where A1.FIPS>A2.FIPS
 			And	A1.Border.STIntersects(A2.Border)=1 -- Borders intersect
@@ -8,8 +9,9 @@ Select A1.FIPS As A1_State_FIPS,A2.FIPS As A2_State_FIPS
 Go
 Alter Table GerryMatter..State_Neighbor Add Constraint State_Neighbor_PK Primary Key(A1_State_FIPS,A2_State_FIPS)
 
+Drop Table If Exists GerryMatter..Congressional_District_Neighbor
 Select A1.State_FIPS As State_FIPS,A1.Congressional_District As A1_Congressional_District,A2.Congressional_District As A2_Congressional_District
-	Into Congressional_District_Neighbor
+	Into GerryMatter..Congressional_District_Neighbor
 	From GerryMatter..Congressional_District A1 Cross Join GerryMatter..Congressional_District A2
 	Where A1.State_FIPS=A2.State_FIPS
 		And A1.Congressional_District>A2.Congressional_District
@@ -17,9 +19,10 @@ Select A1.State_FIPS As State_FIPS,A1.Congressional_District As A1_Congressional
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Alter Table GerryMatter..Congressional_District_Neighbor Add Constraint Congressional_District_Neighbor_PK Primary Key(State_FIPS,A1_Congressional_District,A2_Congressional_District)
 
+Drop Table If Exists GerryMatter..County_Neighbor
 Select A1.State_FIPS As State_FIPS,A1.County_FIPS As A1_County_FIPS,A2.County_FIPS As A2_County_FIPS
 --		A1.Border.STIntersection(A2.Border).STLength() As Border_Meter
-	Into County_Neighbor
+	Into GerryMatter..County_Neighbor
 	From GerryMatter..County A1 Cross Join GerryMatter..County A2
 	Where A1.State_FIPS=A2.State_FIPS
 		And A1.County_FIPS>A2.County_FIPS
@@ -27,9 +30,10 @@ Select A1.State_FIPS As State_FIPS,A1.County_FIPS As A1_County_FIPS,A2.County_FI
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Alter Table GerryMatter..County_Neighbor Add Constraint County_Neighbor_PK Primary Key(State_FIPS,A1_County_FIPS,A2_County_FIPS)
 
+Drop Table If Exists GerryMatter..Voting_District_Neighbor
 Select C.*,A1.Precinct As A1_Precinct,A2.Precinct As A2_Precinct,
 		A1.Border.STIntersection(A2.Border).STLength() As Border_Meter
-	Into Voting_District_Neighbor
+	Into GerryMatter..Voting_District_Neighbor
 	From GerryMatter..County_Neighbor C 
 			Inner Join 
 		GerryMatter..Voting_District A1 

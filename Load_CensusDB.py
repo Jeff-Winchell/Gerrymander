@@ -296,8 +296,8 @@ if Minimum_Granularity=='Census Block':
 
 os.system('sqlcmd -E -i Precinct_Congressional_District.sql')
 os.system('sqlcmd -E -i Fix_Borders_Precinct.sql')
-os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
 os.system('sqlcmd -E -i Edge_Precinct.sql')
+os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
 os.system('sqlcmd -E -i Congressional_District_Border_Precinct.sql')
 if Minimum_Granularity=='Census Block':
     os.system('sqlcmd -E -i Fix_Borders_Census_Block.sql')
