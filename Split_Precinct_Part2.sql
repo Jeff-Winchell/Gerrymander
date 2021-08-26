@@ -101,3 +101,21 @@ Delete From GerryMatter..Voting_District
 						And Voting_District.County_FIPS=Precinct_Change.County_FIPS
 						And Voting_District.Precinct=Precinct_Change.Precinct)
 Commit
+
+--Remove points, lines, linestrings from borders
+Declare @Geometry_Number Table (N Int)
+Insert Into @Geometry_Number Select top 100 ROW_NUMBER() Over (Order By Object_id) From sys.all_objects
+
+Update GerryMatter..Voting_District
+	Set Border=Fixed.Border
+	From (Select State_FIPS,County_FIPS,Precinct,geography::UnionAggregate(Border.STGeometryN(N)) As Border
+		From (Select * From GerryMatter..Voting_District Where Border.STGeometryType()='GeometryCollection') Voting_District
+				Inner Join 
+			@Geometry_Number
+					On N <= Border.STNumGeometries()
+		Where Border.STGeometryN(N).STGeometryType() In  ('Polygon','MultiPolygon')
+		Group By State_FIPS,County_FIPS,Precinct
+		) Fixed
+	Where Fixed.State_FIPS=Voting_District.State_FIPS
+		And Fixed.County_FIPS=Voting_District.County_FIPS
+		And Fixed.Precinct=Voting_District.Precinct

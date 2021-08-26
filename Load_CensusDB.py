@@ -294,11 +294,46 @@ if Minimum_Granularity=='Census Block':
     os.system('sqlcmd -E -Q "Set Quoted_Identifier On; Create Spatial Index Border On GerryMatter..Census_Block(Border)"')
     os.system('sqlcmd -E -Q "Set Quoted_Identifier On; Create Index Calc_Area On GerryMatter..Census_Block(Calc_Area)"')
 
+if Minimum_Granularity=='Precinct':
+    os.system('sqlcmd -E -d GerryMatter_Raw -Q "Drop Table If Exists One_State_Census_Block_Geo;Create Table One_State_Census_Block_Geo (State_FIPS TinyInt Not Null,County_FIPS SmallInt Not Null,Census_Tract Int Not Null,Census_Block SmallInt Not Null, Border Text Not Null,Constraint One_State_Census_Block_Geo_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block));Exec sp_tableoption \'dbo.One_State_Census_Block_Geo\', \'table lock on bulk load\', 1"')
+    os.system('sqlcmd -E -d GerryMatter_Raw -Q "Drop Table If Exists Census_Block_Geo;Create Table Census_Block_Geo (State_FIPS TinyInt Not Null,County_FIPS SmallInt Not Null,Census_Tract Int Not Null,Census_Block SmallInt Not Null, Border Text Not Null);Exec sp_tableoption \'dbo.Census_Block_Geo\', \'table lock on bulk load\', 1"')
+
 os.system('sqlcmd -E -i Precinct_Congressional_District.sql')
+os.system('sqlcmd -E -i Split_Precinct_Part1.sql')
+
+if Minimum_Granularity=='Precinct':
+    print(datetime.datetime.now(),'Census Block')
+    for FIPS,State_Detail in State.items():
+        if State_Detail[0] not in ['OR','ME','WV','CA','HI']:
+
+            print(datetime.datetime.now(),State_Detail[1])
+            with open('Temp.csv','w') as Output:
+                filename='tl_2020_'+f"{FIPS:02}"+'_tabblock20'
+                request.urlretrieve('https://www2.census.gov/geo/tiger/TIGER2020/TABBLOCK20/'+filename+'.zip','temp.zip')
+                with ZipFile('temp.zip') as tempzip:
+                    tempzip.extract(filename+'.dbf')
+                    tempzip.extract(filename+'.shp')
+                    Output.writelines([str(int(row.record.STATEFP20))+'|'+str(int(row.record.COUNTYFP20))+'|'+str(int(row.record.TRACTCE20))+'|'+row.record.BLOCKCE20+'|'
+                                                    +pygeoif.geometry.as_shape(row.shape).to_wkt()+'\n'
+                                            for row in shapefile.Reader(filename+'.shp').shapeRecords()
+                                                if int(row.record.STATEFP20) in State])
+                    os.remove(filename+'.dbf')
+                    os.remove(filename+'.shp')
+                os.remove('temp.zip')
+            os.system('cmd /c sqlcmd -E -Q "Bulk Insert GerryMatter_Raw.dbo.One_State_Census_Block_Geo From \''+os.getcwd()+'\\temp.csv\' With (Format=\'CSV\',MaxErrors=1,DataFileType=\'char\',FieldTerminator=\'|\')"')
+            os.system('cmd /c sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.Census_Block_Geo with (Tablock) Select * From GerryMatter_Raw.dbo.One_State_Census_Block_Geo One Where Exists(Select * From GerryMatter_Raw..Census_Block_Split_Voting_District Split Where Split.State_FIPS=One.State_FIPS And Split.County_FIPS=One.County_FIPS And Split.Census_Tract=One.Census_Tract And Split.Census_Block=Split.Census_Block)"')
+            os.system('cmd /c sqlcmd -E -Q "Truncate Table GerryMatter_Raw.dbo.One_State_Census_Block_Geo"')
+
+    os.system('sqlcmd -E -d GerryMatter_Raw -Q "Alter Table Census_Block_Geo Add Constraint Census_Block_Geo_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block)"')
+
+print(datetime.datetime.now(),'Precinct Split')
+os.system('sqlcmd -E -i Split_Precinct_Part2.sql')
+print(datetime.datetime.now(),'Borders')
 os.system('sqlcmd -E -i Fix_Borders_Precinct.sql')
+if Minimum_Granularity=='Census Block':
+    os.system('sqlcmd -E -i Fix_Borders_Census_Block.sql')
 os.system('sqlcmd -E -i Edge_Precinct.sql')
 os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
 os.system('sqlcmd -E -i Congressional_District_Border_Precinct.sql')
-if Minimum_Granularity=='Census Block':
-    os.system('sqlcmd -E -i Fix_Borders_Census_Block.sql')
+
 print(datetime.datetime.now(),'Done')
