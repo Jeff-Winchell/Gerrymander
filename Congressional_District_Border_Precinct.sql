@@ -19,6 +19,7 @@ Select Voting_District_Neighbor.State_FIPS,
 				On Voting_District_Neighbor.State_FIPS=A2.State_FIPS
 					And Voting_District_Neighbor.A2_County_FIPS=A2.County_FIPS
 					And Voting_District_Neighbor.A2_Precinct=A2.Precinct
+	Where A1.Congressional_District<>A2.Congressional_District
 Go
 Alter Table GerryMatter..Congressional_District_Border_Precinct 
 	Add Constraint Congressional_District_Border_Precinct_PK Primary Key(State_FIPS,A1_County_FIPS,A1_Precinct,A1_Congressional_District,A2_County_FIPS,A2_Precinct,A2_Congressional_District)
