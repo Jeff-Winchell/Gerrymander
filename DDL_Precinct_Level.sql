@@ -120,7 +120,7 @@ Select Key1,Key2,geography::UnionAggregate(Border)
 		Insert Into @Connected_Region Select * From dbo.ConnectRegions(@Possibly_Unconnected_Region)
 	Return
 End
-
+Go
 If(DB_Id(N'GerryMatter_Raw') Is Not Null) Begin
 	Use Master
 	Drop Database GerryMatter_Raw
