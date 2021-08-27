@@ -57,6 +57,70 @@ Create Table Voting_District (
 	Constraint Voting_District_PK Primary Key(State_FIPS,County_FIPS,Precinct),
 	Constraint Voting_District_County_FK Foreign Key(State_FIPS,County_FIPS) References County
 	)
+Create Type dbo.Region As Table (Key1 Int,Key2 Int,Border Geography Primary Key(Key1,Key2))
+Go
+Create Or Alter Function dbo.ConnectRegions(@Region Region ReadOnly)
+	Returns @Connected_Region Table (
+							Key1 Int,
+							Key2 Int,
+							Border Geography
+						)
+As Begin
+Declare @Geometry_Number Table (N Int)
+Insert Into @Geometry_Number Select top 100 ROW_NUMBER() Over (Order By Object_id) From sys.all_objects
+Declare @Possibly_Unconnected_Region dbo.Region
+
+Insert into @Possibly_Unconnected_Region
+Select Key1,Key2,geography::UnionAggregate(Border)
+	From (Select Key1,Key2,
+				Case When Border1.STIntersection(Border2).STGeometryType()='Point' 
+					Then Border1.STIntersection(Border2).STBuffer(.01).STUnion(Border1).STUnion(Border2)
+					When Border1.STIntersection(Border2).STGeometryType()='MultiPoint'
+					Then Border1.STIntersection(Border2).STGeometryN(1).STBuffer(.01).STUnion(Border1).STUnion(Border2)
+					Else Border1.ShortestLineTo(Border2).STBuffer(.01).STUnion(Border1).STUnion(Border2) 
+					End As Border
+			From (Select Polygon1.Key1,
+						Polygon1.Key2,
+						Polygon1.N As N1,
+						Polygon2.N As N2,
+						Polygon1.Border As Border1,
+						Polygon2.Border As Border2,
+						Row_Number() Over (Partition By Polygon1.Key1,Polygon1.Key2 Order By Polygon1.Border.STDistance(Polygon2.Border)) As Distance_Rank
+ 					From (Select Key1,Key2,N,Border.STGeometryN(N) As Border	
+							From (Select * From @Region Where Border.STGeometryType()='MultiPolygon') Region
+									Inner Join 
+								@Geometry_Number
+										On N <= Border.STNumGeometries()
+						) Polygon1
+							Inner Join
+						(Select Key1,Key2,N,Border.STGeometryN(N) As Border	
+							From (Select * From @Region Where Border.STGeometryType()='MultiPolygon') Region
+									Inner Join 
+								@Geometry_Number
+										On N <= Border.STNumGeometries()
+						) Polygon2
+								On Polygon1.Key1=Polygon2.Key1 And Polygon1.Key2=Polygon2.Key2 And Polygon1.N>Polygon2.N
+				) Closest
+			Where Distance_Rank=1
+		Union All
+			Select Key1,Key2,Border From @Region
+		) Multipolygon
+	Group By Key1,Key2
+	Declare @Message NVarChar(200)
+	--- Number of disconnected regions has gone down or is 1. Otherwise, something is wrong
+	If Exists(Select * From @Possibly_Unconnected_Region N Inner Join @Region O On O.Key1=N.Key1 And O.Key2=N.Key2 Where Not (O.Border.STNumGeometries()>N.Border.STNumGeometries() Or N.Border.STNumGeometries()=1)) Begin
+		Select Top 1 @Message='Error in ConnectRegions for Key1:'+LTrim(Str(N.Key1))+' Key2:'+LTrim(Str(N.Key2))+'. Number of Unconnected Regions has grown.' 
+			From @Possibly_Unconnected_Region N Inner Join @Region O On O.Key1=N.Key1 And O.Key2=N.Key2 
+			Where Not (O.Border.STNumGeometries()>N.Border.STNumGeometries() Or N.Border.STNumGeometries()=1)
+		Declare @Error_Reporting_in_Function_Hack Int = Cast(@Message as Int) 
+	End
+	If Not Exists(Select * From @Possibly_Unconnected_Region Where Border.STGeometryType()<>'Polygon')
+		Insert Into @Connected_Region Select * From @Possibly_Unconnected_Region
+	Else
+		Insert Into @Connected_Region Select * From dbo.ConnectRegions(@Possibly_Unconnected_Region)
+	Return
+End
+
 If(DB_Id(N'GerryMatter_Raw') Is Not Null) Begin
 	Use Master
 	Drop Database GerryMatter_Raw

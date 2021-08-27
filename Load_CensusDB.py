@@ -335,5 +335,7 @@ if Minimum_Granularity=='Census Block':
 os.system('sqlcmd -E -i Edge_Precinct.sql')
 os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
 os.system('sqlcmd -E -i Congressional_District_Border_Precinct.sql')
-
+os.system('sqlcmd -E -i Make_State_Precinct_Id.sql')
+print(datetime.datetime.now(),'Connect Unconnected Regions')
+os.system('sqlcmd -E -i Connect_Unconnected_Regions.sql')
 print(datetime.datetime.now(),'Done')
