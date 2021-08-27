@@ -7,20 +7,18 @@ import os
 from io import TextIOWrapper
 from urllib import request
 import datetime
-os.system('cmd /c sqlcmd -E -i DDL_Precinct_Level.sql')
+os.system('sqlcmd -E -i DDL_Precinct_Level.sql')
 if Minimum_Granularity=='Census Block':
-    os.system('cmd /c sqlcmd -E -i DDL_Census_Block.sql')
+    os.system('sqlcmd -E -i DDL_Census_Block.sql')
 
-os.system('cmd /c sqlcmd -E -i Import_State_main.sql')
-
-State={1:('AL','Alabama'),4:('AZ','Arizona'),5:('AR','Arkansas'),6:('CA','California'),8:('CO','Colorado'),9:('CT','Connecticut'),12:('FL','Florida'),
-        13:('GA','Georgia'),15:('HI','Hawaii'),16:('ID','Idaho'),17:('IL','Illinois'),18:('IN','Indiana'),19:('IA','Iowa'),20:('KS','Kansas'),21:('KY','Kentucky'),
-        22:('LA','Louisiana'),23:('ME','Maine'),24:('MD','Maryland'),25:('MA','Massachusetts'),26:('MI','Michigan'),27:('MN','Minnesota'),28:('MS','Mississippi'),
-        29:('MO','Missouri'),30:('MT','Montana'),31:('NE','Nebraska'),32:('NV','Nevada'),33:('NH','New Hampshire'),34:('NJ','New Jersey'),35:('NM','New Mexico'),
-        36:('NY','New York'),37:('NC','North Carolina'),39:('OH','Ohio'),40:('OK','Oklahoma'),41:('OR','Oregon'),42:('PA','Pennsylvania'),44:('RI','Rhode Island'),
-        45:('SC','South Carolina'),47:('TN','Tennessee'),48:('TX','Texas'),49:('UT','Utah'),51:('VA','Virginia'),53:('WA','Washington'),54:('WV','West Virginia'),55:('WI','Wisconsin')}
-
-
+State={1:('AL','Alabama'),4:('AZ','Arizona'),5:('AR','Arkansas'),6:('CA','California',-1),8:('CO','Colorado',1),9:('CT','Connecticut'),12:('FL','Florida',1),
+        13:('GA','Georgia'),15:('HI','Hawaii'),16:('ID','Idaho'),17:('IL','Illinois',-1),18:('IN','Indiana'),19:('IA','Iowa'),20:('KS','Kansas'),21:('KY','Kentucky'),
+        22:('LA','Louisiana'),23:('ME','Maine'),24:('MD','Maryland'),25:('MA','Massachusetts'),26:('MI','Michigan',-1),27:('MN','Minnesota'),28:('MS','Mississippi'),
+        29:('MO','Missouri'),30:('MT','Montana',-1),31:('NE','Nebraska'),32:('NV','Nevada'),33:('NH','New Hampshire'),34:('NJ','New Jersey'),35:('NM','New Mexico'),
+        36:('NY','New York',-1),37:('NC','North Carolina',1),39:('OH','Ohio',-1),40:('OK','Oklahoma'),41:('OR','Oregon',1),42:('PA','Pennsylvania',-1),44:('RI','Rhode Island'),
+        45:('SC','South Carolina'),47:('TN','Tennessee'),48:('TX','Texas',2),49:('UT','Utah'),51:('VA','Virginia'),53:('WA','Washington'),54:('WV','West Virginia',-1),55:('WI','Wisconsin')}
+for FIPS,State_Details in State.items():
+    os.system('sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.[State] (FIPS,Postal,[Name]'+(',CD_Change_2020' if len(State_Details)==4 else '')+') Values ('+str(FIPS)+',\''+State_Details[0]+'\',\''+State_Details[0]+'\''+(','+str(State_Details[3]) if len(State_Details)==4 else '')+')"')
 print(datetime.datetime.now(),'Starting Population Area')
 with open('State_Population_Area.csv','w') as State_Output:
     with open('County_Population_Area.csv','w') as County_Output:
@@ -320,9 +318,9 @@ if Minimum_Granularity=='Precinct':
                     os.remove(filename+'.dbf')
                     os.remove(filename+'.shp')
                 os.remove('temp.zip')
-            os.system('cmd /c sqlcmd -E -Q "Bulk Insert GerryMatter_Raw.dbo.One_State_Census_Block_Geo From \''+os.getcwd()+'\\temp.csv\' With (Format=\'CSV\',MaxErrors=1,DataFileType=\'char\',FieldTerminator=\'|\')"')
-            os.system('cmd /c sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.Census_Block_Geo with (Tablock) Select * From GerryMatter_Raw.dbo.One_State_Census_Block_Geo One Where Exists(Select * From GerryMatter_Raw..Census_Block_Split_Voting_District Split Where Split.State_FIPS=One.State_FIPS And Split.County_FIPS=One.County_FIPS And Split.Census_Tract=One.Census_Tract And Split.Census_Block=Split.Census_Block)"')
-            os.system('cmd /c sqlcmd -E -Q "Truncate Table GerryMatter_Raw.dbo.One_State_Census_Block_Geo"')
+            os.system('sqlcmd -E -Q "Bulk Insert GerryMatter_Raw.dbo.One_State_Census_Block_Geo From \''+os.getcwd()+'\\temp.csv\' With (Format=\'CSV\',MaxErrors=1,DataFileType=\'char\',FieldTerminator=\'|\')"')
+            os.system('sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.Census_Block_Geo with (Tablock) Select * From GerryMatter_Raw.dbo.One_State_Census_Block_Geo One Where Exists(Select * From GerryMatter_Raw..Census_Block_Split_Voting_District Split Where Split.State_FIPS=One.State_FIPS And Split.County_FIPS=One.County_FIPS And Split.Census_Tract=One.Census_Tract And Split.Census_Block=Split.Census_Block)"')
+            os.system('sqlcmd -E -Q "Truncate Table GerryMatter_Raw.dbo.One_State_Census_Block_Geo"')
 
     os.system('sqlcmd -E -d GerryMatter_Raw -Q "Alter Table Census_Block_Geo Add Constraint Census_Block_Geo_PK Primary Key(State_FIPS,County_FIPS,Census_Tract,Census_Block)"')
 
