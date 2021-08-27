@@ -8,6 +8,8 @@ Select A1.FIPS As A1_State_FIPS,A2.FIPS As A2_State_FIPS
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Go
 Alter Table GerryMatter..State_Neighbor Add Constraint State_Neighbor_PK Primary Key(A1_State_FIPS,A2_State_FIPS)
+Alter Table GerryMatter..State_Neighbor Add Constraint State_Neighbor_FK1 Foreign Key(A1_State_FIPS) References [State] On Delete No Action On Update No Action
+Alter Table GerryMatter..State_Neighbor Add Constraint State_Neighbor_FK2 Foreign Key(A2_State_FIPS) References [State] On Delete No Action On Update No Action
 
 Drop Table If Exists GerryMatter..Congressional_District_Neighbor
 Select A1.State_FIPS As State_FIPS,A1.Congressional_District As A1_Congressional_District,A2.Congressional_District As A2_Congressional_District
@@ -18,6 +20,8 @@ Select A1.State_FIPS As State_FIPS,A1.Congressional_District As A1_Congressional
 			And	A1.Border.STIntersects(A2.Border)=1 -- Borders intersect
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Alter Table GerryMatter..Congressional_District_Neighbor Add Constraint Congressional_District_Neighbor_PK Primary Key(State_FIPS,A1_Congressional_District,A2_Congressional_District)
+Alter Table GerryMatter..Congressional_District_Neighbor Add Constraint Congressional_District_Neighbor_FK1 Foreign Key(State_FIPS,A1_Congressional_District) References Congressional_District On Delete No Action On Update No Action
+Alter Table GerryMatter..Congressional_District_Neighbor Add Constraint Congressional_District_Neighbor_FK2 Foreign Key(State_FIPS,A2_Congressional_District) References Congressional_District On Delete No Action On Update No Action
 
 Drop Table If Exists GerryMatter..County_Neighbor
 Select A1.State_FIPS As State_FIPS,A1.County_FIPS As A1_County_FIPS,A2.County_FIPS As A2_County_FIPS
@@ -29,9 +33,12 @@ Select A1.State_FIPS As State_FIPS,A1.County_FIPS As A1_County_FIPS,A2.County_FI
 			And	A1.Border.STIntersects(A2.Border)=1 -- Borders intersect
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Alter Table GerryMatter..County_Neighbor Add Constraint County_Neighbor_PK Primary Key(State_FIPS,A1_County_FIPS,A2_County_FIPS)
+Alter Table GerryMatter..County_Neighbor Add Constraint County_Neighbor_FK1 Foreign Key(State_FIPS,A1_County_FIPS) References County On Delete No Action On Update No Action
+Alter Table GerryMatter..County_Neighbor Add Constraint County_Neighbor_FK2 Foreign Key(State_FIPS,A2_County_FIPS) References County On Delete No Action On Update No Action
+
 
 Drop Table If Exists GerryMatter..Voting_District_Neighbor
-Select C.*,A1.Precinct As A1_Precinct,A2.Precinct As A2_Precinct,
+Select A1.State_FIPS,A1.State_Precinct_Id As A1_State_Precinct_Id,A2.State_Precinct_Id As A2_State_Precinct_Id,
 		A1.Border.STIntersection(A2.Border).STLength() As Border_Meter
 	Into GerryMatter..Voting_District_Neighbor
 	From GerryMatter..County_Neighbor C 
@@ -46,8 +53,8 @@ Select C.*,A1.Precinct As A1_Precinct,A2.Precinct As A2_Precinct,
 	Where A1.Border.STIntersects(A2.Border)=1 -- Borders intersect
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Union
-	Select A1.State_FIPS,A1.County_FIPS As A1_County_FIPS,A2.County_FIPS As A2_County_FIPS,
-			A1.Precinct As A1_Precinct,A2.Precinct As A2_Precinct,
+	Select A1.State_FIPS,
+			A1.State_Precinct_Id As A1_State_Precinct_Id,A2.State_Precinct_Id As A2_State_Precinct_Id,
 			A1.Border.STIntersection(A2.Border).STLength() As Border_Meter
 		From GerryMatter..Voting_District A1 
 				Inner Join
@@ -59,4 +66,4 @@ Union
 			And A1.Border.STIntersection(A2.Border).STGeometryType()<>'Point'
 Go
 Alter Table GerryMatter..Voting_District_Neighbor Alter Column Border_Meter Float Not Null
-Alter Table GerryMatter..Voting_District_Neighbor Add Constraint Voting_District_Neighbor_PK Primary Key (State_FIPS,A1_County_FIPS,A1_Precinct,A2_County_FIPS,A2_Precinct)
+Alter Table GerryMatter..Voting_District_Neighbor Add Constraint Voting_District_Neighbor_PK Primary Key (State_FIPS,A1_State_Precinct_Id,A2_State_Precinct_Id)

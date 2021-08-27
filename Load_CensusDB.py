@@ -19,7 +19,7 @@ State={1:('AL','Alabama'),4:('AZ','Arizona'),5:('AR','Arkansas'),6:('CA','Califo
         45:('SC','South Carolina'),47:('TN','Tennessee'),48:('TX','Texas',2),49:('UT','Utah'),51:('VA','Virginia'),53:('WA','Washington'),54:('WV','West Virginia',-1),55:('WI','Wisconsin')}
 #State={33:('NH','New Hampshire')}
 for FIPS,State_Details in State.items():
-    os.system('sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.[State] (FIPS,Postal,[Name]'+(',CD_Change_2020' if len(State_Details)==4 else '')+') Values ('+str(FIPS)+',\''+State_Details[0]+'\',\''+State_Details[0]+'\''+(','+str(State_Details[3]) if len(State_Details)==4 else '')+')"')
+    os.system('sqlcmd -E -Q "Set NoCount On; Insert Into GerryMatter_Raw.dbo.[State] (FIPS,Postal,[Name]'+(',CD_Change_2020' if len(State_Details)==4 else '')+') Values ('+str(FIPS)+',\''+State_Details[0]+'\',\''+State_Details[0]+'\''+(','+str(State_Details[3]) if len(State_Details)==4 else '')+')"')
 print(datetime.datetime.now(),'Starting Population Area')
 with open('State_Population_Area.csv','w') as State_Output:
     with open('County_Population_Area.csv','w') as County_Output:
@@ -320,6 +320,7 @@ if Minimum_Granularity=='Precinct':
                     os.remove(filename+'.shp')
                 os.remove('temp.zip')
             os.system('sqlcmd -E -Q "Bulk Insert GerryMatter_Raw.dbo.One_State_Census_Block_Geo From \''+os.getcwd()+'\\temp.csv\' With (Format=\'CSV\',MaxErrors=1,DataFileType=\'char\',FieldTerminator=\'|\')"')
+            os.remove('temp.csv')
             os.system('sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.Census_Block_Geo with (Tablock) Select * From GerryMatter_Raw.dbo.One_State_Census_Block_Geo One Where Exists(Select * From GerryMatter_Raw..Census_Block_Split_Voting_District Split Where Split.State_FIPS=One.State_FIPS And Split.County_FIPS=One.County_FIPS And Split.Census_Tract=One.Census_Tract And Split.Census_Block=Split.Census_Block)"')
             os.system('sqlcmd -E -Q "Truncate Table GerryMatter_Raw.dbo.One_State_Census_Block_Geo"')
 
@@ -327,14 +328,18 @@ if Minimum_Granularity=='Precinct':
 
 print(datetime.datetime.now(),'Precinct Split')
 os.system('sqlcmd -E -i Split_Precinct_Part2.sql')
-print(datetime.datetime.now(),'Borders')
+print(datetime.datetime.now(),'Make_State_Precinct_Id')
+os.system('sqlcmd -E -i Make_State_Precinct_Id.sql')
+print(datetime.datetime.now(),'Fix_Borders')
 os.system('sqlcmd -E -i Fix_Borders_Precinct.sql')
 if Minimum_Granularity=='Census Block':
     os.system('sqlcmd -E -i Fix_Borders_Census_Block.sql')
+print(datetime.datetime.now(),'Edge_Precinct')
 os.system('sqlcmd -E -i Edge_Precinct.sql')
+print(datetime.datetime.now(),'Fix_Overlapping_Borders_Precinct')
 os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
+print(datetime.datetime.now(),'Congressional_District_Border_Precinct')
 os.system('sqlcmd -E -i Congressional_District_Border_Precinct.sql')
-os.system('sqlcmd -E -i Make_State_Precinct_Id.sql')
-print(datetime.datetime.now(),'Connect Unconnected Regions')
-#os.system('sqlcmd -E -i Connect_Unconnected_Regions.sql')
+#print(datetime.datetime.now(),'Connect Unconnected Regions')
+#os.system('sqlcmd -E -i -d GerryMatter Connect_Unconnected_Regions.sql')
 print(datetime.datetime.now(),'Done')

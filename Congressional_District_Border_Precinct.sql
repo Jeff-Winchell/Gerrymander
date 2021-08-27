@@ -1,9 +1,7 @@
 Drop Table If Exists GerryMatter..Congressional_District_Border_Precinct
 Select Voting_District_Neighbor.State_FIPS,
-		Voting_District_Neighbor.A1_County_FIPS,
-		Voting_District_Neighbor.A2_County_FIPS,
-		Voting_District_Neighbor.A1_Precinct,
-		Voting_District_Neighbor.A2_Precinct,
+		Voting_District_Neighbor.A1_State_Precinct_Id,
+		Voting_District_Neighbor.A2_State_Precinct_Id,
 		A1.Congressional_District As A1_Congressional_District,  -- Temporarily Redundant
 		A2.Congressional_District As A2_Congressional_District,  -- Temporarily Redundant
 		Voting_District_Neighbor.Border_Meter
@@ -12,13 +10,11 @@ Select Voting_District_Neighbor.State_FIPS,
 			Inner Join
 		GerryMatter..Voting_District_Congressional_District A1
 				On Voting_District_Neighbor.State_FIPS=A1.State_FIPS
-					And Voting_District_Neighbor.A1_County_FIPS=A1.County_FIPS
-					And Voting_District_Neighbor.A1_Precinct=A1.Precinct
+					And Voting_District_Neighbor.A1_State_Precinct_Id=A1.Precinct
 			Inner Join
 		GerryMatter..Voting_District_Congressional_District A2
 				On Voting_District_Neighbor.State_FIPS=A2.State_FIPS
-					And Voting_District_Neighbor.A2_County_FIPS=A2.County_FIPS
-					And Voting_District_Neighbor.A2_Precinct=A2.Precinct
+					And Voting_District_Neighbor.A2_State_Precinct_Id=A2.Precinct
 	Where A1.Congressional_District<>A2.Congressional_District
 Go
 Alter Table GerryMatter..Congressional_District_Border_Precinct 

@@ -13,6 +13,7 @@ Set Border=[Output].Border
 Delete From @Output
 Commit
 
+Begin Transaction
 Insert Into @Input
 Select State_FIPS,Congressional_District,Border From GerryMatter..Congressional_District
 Insert Into @Output
@@ -25,7 +26,9 @@ Set Border=[Output].Border
 		And [Output].Key2=Congressional_District.Congressional_District
 		And Congressional_District.Border.STGeometryType()<>'Polygon'
 Delete From @Output
+Commit
 
+Begin Transaction
 Insert Into @Input
 Select State_FIPS,County_FIPS,Border From GerryMatter..County
 Insert Into @Output
@@ -38,9 +41,11 @@ Set Border=[Output].Border
 		And [Output].Key2=County.County_FIPS
 		And County.Border.STGeometryType()<>'Polygon'
 Delete From @Output
+Commit
 
+Begin Transaction
 Insert Into @Input
-Select State_FIPS,County_FIPS,Border From GerryMatter..Voting_District
+Select State_FIPS,State_Precinct_Id,Border From GerryMatter..Voting_District
 Insert Into @Output
 select * From dbo.ConnectRegions(@Input)
 Delete From @Input
@@ -51,3 +56,4 @@ Set Border=[Output].Border
 		And [Output].Key2=Voting_District.State_Precinct_Id
 		And Voting_District.Border.STGeometryType()<>'Polygon'
 Delete From @Output
+Commit

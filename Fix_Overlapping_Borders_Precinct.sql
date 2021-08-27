@@ -45,12 +45,10 @@ From GerryMatter..Voting_District_Neighbor
 		Inner Join
 	GerryMatter..Voting_District A1 
 			On Voting_District_Neighbor.State_FIPS=A1.State_FIPS
-				And Voting_District_Neighbor.A1_County_FIPS=A1.County_FIPS
-				And Voting_District_Neighbor.A1_Precinct=A1.Precinct
+				And Voting_District_Neighbor.A1_State_Precinct_Id=A1.State_Precinct_Id
 		Inner Join
 	GerryMatter..Voting_District A2
 			On Voting_District_Neighbor.State_FIPS=A2.State_FIPS
-				And Voting_District_Neighbor.A2_County_FIPS=A2.County_FIPS
-				And Voting_District_Neighbor.A2_Precinct=A2.Precinct
+				And Voting_District_Neighbor.A2_State_Precinct_Id=A2.State_Precinct_Id
 Where A1.Border.STIntersection(A2.Border).STGeometryType() In ('Polygon','Multipolygon','GeometryCollection') -- Bad Borders
 		And A1.Border.STDifference(A2.Border).STIntersection(A2.Border).STGeometryType() Not In ('Polygon','Multipolygon','GeometryCollection') -- Intersection after Differencing with one side buffered fixes
