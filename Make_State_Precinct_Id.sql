@@ -5,6 +5,7 @@ Select State_FIPS,County_FIPS,Precinct,
 Go
 Alter Table GerryMatter..Voting_District Add State_Precinct_Id SmallInt Not Null Constraint TempDefault Default 0
 Go
+Set Quoted_Identifier On
 Update Voting_District
 	Set State_Precinct_Id=#Foo.State_Precinct_Id
 	From GerryMatter..Voting_District Inner Join #Foo
