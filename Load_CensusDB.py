@@ -17,6 +17,7 @@ State={1:('AL','Alabama'),4:('AZ','Arizona'),5:('AR','Arkansas'),6:('CA','Califo
         29:('MO','Missouri'),30:('MT','Montana',-1),31:('NE','Nebraska'),32:('NV','Nevada'),33:('NH','New Hampshire'),34:('NJ','New Jersey'),35:('NM','New Mexico'),
         36:('NY','New York',-1),37:('NC','North Carolina',1),39:('OH','Ohio',-1),40:('OK','Oklahoma'),41:('OR','Oregon',1),42:('PA','Pennsylvania',-1),44:('RI','Rhode Island'),
         45:('SC','South Carolina'),47:('TN','Tennessee'),48:('TX','Texas',2),49:('UT','Utah'),51:('VA','Virginia'),53:('WA','Washington'),54:('WV','West Virginia',-1),55:('WI','Wisconsin')}
+#State={33:('NH','New Hampshire')}
 for FIPS,State_Details in State.items():
     os.system('sqlcmd -E -Q "Insert Into GerryMatter_Raw.dbo.[State] (FIPS,Postal,[Name]'+(',CD_Change_2020' if len(State_Details)==4 else '')+') Values ('+str(FIPS)+',\''+State_Details[0]+'\',\''+State_Details[0]+'\''+(','+str(State_Details[3]) if len(State_Details)==4 else '')+')"')
 print(datetime.datetime.now(),'Starting Population Area')
@@ -335,5 +336,5 @@ os.system('sqlcmd -E -i Fix_Overlapping_Borders_Precinct.sql')
 os.system('sqlcmd -E -i Congressional_District_Border_Precinct.sql')
 os.system('sqlcmd -E -i Make_State_Precinct_Id.sql')
 print(datetime.datetime.now(),'Connect Unconnected Regions')
-os.system('sqlcmd -E -i Connect_Unconnected_Regions.sql')
+#os.system('sqlcmd -E -i Connect_Unconnected_Regions.sql')
 print(datetime.datetime.now(),'Done')
