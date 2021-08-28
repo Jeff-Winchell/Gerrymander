@@ -15,6 +15,8 @@ Other versions or flavors of SQL with geospatial abilities (e.g. PostgreSQL, Ora
 
 Downloading the census data takes an hour and requires at 20 GB of space for the census data. It requires 60 GB and up to a day of processing if you use census tracts, block groups and blocks - which is enabled by changing the first line of Load_CensusDB.py.  If you want much less data (e.g. just for one state) edit the dictionary of states near the start of Load_CensusDB.py.
 
+If you want a really quick download (1-10 minutes) choose just one state from the dictionary at the top of Load_CensusDB.py and uncomment the line just below this that has just one state (filling in the data for your chosen state). 
+
 The usable precinct-level census data represents 39 states and 364 house of representative seats. 6 others are in single district states, so not relevant. The remaining 65 seats are in 5 states where some other method will be used.
 
 Make_Main_Env.bat creates the conda environment needed to run this project's code
