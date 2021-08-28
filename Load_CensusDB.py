@@ -2,10 +2,10 @@ Minimum_Granularity='Precinct' ## Change to Census Block if you want census trac
 State={1:('AL','Alabama'),4:('AZ','Arizona'),5:('AR','Arkansas'),6:('CA','California',-1),8:('CO','Colorado',1),9:('CT','Connecticut'),12:('FL','Florida',1),
         13:('GA','Georgia'),15:('HI','Hawaii'),16:('ID','Idaho'),17:('IL','Illinois',-1),18:('IN','Indiana'),19:('IA','Iowa'),20:('KS','Kansas'),21:('KY','Kentucky'),
         22:('LA','Louisiana'),23:('ME','Maine'),24:('MD','Maryland'),25:('MA','Massachusetts'),26:('MI','Michigan',-1),27:('MN','Minnesota'),28:('MS','Mississippi'),
-        29:('MO','Missouri'),30:('MT','Montana',-1),31:('NE','Nebraska'),32:('NV','Nevada'),33:('NH','New Hampshire'),34:('NJ','New Jersey'),35:('NM','New Mexico'),
+        29:('MO','Missouri'),30:('MT','Montana',1),31:('NE','Nebraska'),32:('NV','Nevada'),33:('NH','New Hampshire'),34:('NJ','New Jersey'),35:('NM','New Mexico'),
         36:('NY','New York',-1),37:('NC','North Carolina',1),39:('OH','Ohio',-1),40:('OK','Oklahoma'),41:('OR','Oregon',1),42:('PA','Pennsylvania',-1),44:('RI','Rhode Island'),
         45:('SC','South Carolina'),47:('TN','Tennessee'),48:('TX','Texas',2),49:('UT','Utah'),51:('VA','Virginia'),53:('WA','Washington'),54:('WV','West Virginia',-1),55:('WI','Wisconsin')}
-#State={33:('NH','New Hampshire')}
+#State={12:('FL','Florida',1),13:('GA','Georgia'),23:('ME','Maine'),26:('MI','Michigan',-1),30:('MT','Montana',1),33:('NH','New Hampshire'),37:('NC','North Carolina',1),48:('TX','Texas',2),54:('WV','West Virginia',-1)}
 
 from zipfile import ZipFile
 import shapefile
